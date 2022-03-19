@@ -28,6 +28,23 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
+        - name: mysql
+          image: {{ .Values.image.mysql }}
+          env:
+            - name: "MYSQL_ROOT_PASSWORD"
+              value: ''
+            - name: "MYSQL_ALLOW_EMPTY_PASSWORD"
+              value: "true"
+            - name: "MYSQL_USER"
+              value: "petclinic"
+            - name: "MYSQL_PASSWORD"
+              value: "petclinic"
+            - name: "MYSQL_DATABASE"
+              value: "petclinic"
+          ports:
+            - name: "mysql-port"
+              containerPort: 3306
+              protocol: TCP
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
