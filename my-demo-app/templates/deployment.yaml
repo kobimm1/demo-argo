@@ -45,6 +45,16 @@ spec:
             - name: "mysql-port"
               containerPort: 3306
               protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: 3306
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+              tcpSocket:
+                port: 3306
+              initialDelaySeconds: 50
+              periodSeconds: 20
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
@@ -54,6 +64,24 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              httpHeaders:
+                - name: Accept
+                  value: application/json
+            initialDelaySeconds: 50
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              httpHeaders:
+                - name: User-Agent
+                  value: MyUserAgent
+            initialDelaySeconds: 20
+            periodSeconds: 10
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
